@@ -106,6 +106,14 @@ export function AssumptionsForm({ value, onChange }: Props) {
         <p className="note">※ 名目利回り。インフレは控除していません。</p>
       </div>
 
+      <div className="form-section">
+        <h3>インフレ率（実質値の換算用）</h3>
+        <div className="field-hint" style={{ marginBottom: 8 }}>
+          結果タブの「実質値で表示」をオンにすると、将来の金額をこの率で今の物価に割り戻します。利回り自体は変えません。
+        </div>
+        <RateField label="想定インフレ率（年）" value={value.inflationRate} onChange={(v) => set('inflationRate', v)} />
+      </div>
+
       <details className="collapsible">
         <summary>詳細設定（税・手数料）</summary>
         <div className="form-section" style={{ marginTop: 10 }}>

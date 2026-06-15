@@ -30,6 +30,7 @@ const assumptionsArb: fc.Arbitrary<Assumptions> = fc.record({
   rConservative: fc.float({ min: Math.fround(-0.9), max: 1, noNaN: true }),
   rBase: fc.float({ min: Math.fround(-0.9), max: 1, noNaN: true }),
   rOptimistic: fc.float({ min: Math.fround(-0.9), max: 1, noNaN: true }),
+  inflationRate: fc.float({ min: Math.fround(-0.5), max: 1, noNaN: true }),
 }).map((r) => ({ ...r, lifeEvents: [], bigExpenses: [] }));
 
 describe('robustness — projection の不変条件', () => {

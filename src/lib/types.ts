@@ -38,6 +38,7 @@ export interface Assumptions {
   rConservative: number;
   rBase: number;
   rOptimistic: number;
+  inflationRate: number;      // 年率インフレ（実質値換算用）
 }
 
 export interface ProjectionRow {

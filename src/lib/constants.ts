@@ -12,6 +12,7 @@ export const IDECO_ANNUAL_FEE = 2_052;             // 口座手数料 (円/年)
 
 // NISA (2024年改正後・恒久化)
 export const NISA_LIFETIME_LIMIT = 18_000_000;    // 生涯投資枠 (円)
+export const NISA_ANNUAL_LIMIT = 3_600_000;       // 年間投資上限 (つみたて120万+成長240万)
 export const NISA_INITIAL_CONSUMED = 600_000;     // 初年度既消化分 (円)
 
 // 税率既定値
@@ -51,6 +52,7 @@ export const DEFAULTS: Assumptions = {
   rConservative: 0.04,
   rBase: 0.06,
   rOptimistic: 0.08,
+  inflationRate: 0.015,
 };
 
 // localStorage/初期化用にarrayを含む深いコピーを返す

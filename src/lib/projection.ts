@@ -1,4 +1,4 @@
-import { NISA_LIFETIME_LIMIT, NISA_INITIAL_CONSUMED, getIdecoMonthlyByYear } from './constants';
+import { NISA_LIFETIME_LIMIT, NISA_ANNUAL_LIMIT, NISA_INITIAL_CONSUMED, getIdecoMonthlyByYear } from './constants';
 import type { Assumptions, ProjectionRow, ProjectionResult, GoalAge } from './types';
 
 function fvCoeff(r: number): number {
@@ -89,12 +89,15 @@ export function runProjection(a: Assumptions): ProjectionResult {
       // 初年度は既消化分のまま
     } else {
       if (!nisaFullReached) {
-        nisaCumNoIdeco = Math.min(NISA_LIFETIME_LIMIT, nisaCumNoIdeco + monthlyInv * 12);
+        // 年間投資はNISA年間枠(360万)が上限。超過分は課税口座扱いで枠は埋まらない。
+        const nisaAnnual = Math.min(monthlyInv * 12, NISA_ANNUAL_LIMIT);
+        nisaCumNoIdeco = Math.min(NISA_LIFETIME_LIMIT, nisaCumNoIdeco + nisaAnnual);
         nisaFullReached = nisaCumNoIdeco >= NISA_LIFETIME_LIMIT;
       }
       if (!nisaWithIdecoReached) {
         const nisaMonthly = Math.max(0, monthlyInv - idecoMonthly);
-        nisaCumWithIdeco = Math.min(NISA_LIFETIME_LIMIT, nisaCumWithIdeco + nisaMonthly * 12);
+        const nisaAnnual = Math.min(nisaMonthly * 12, NISA_ANNUAL_LIMIT);
+        nisaCumWithIdeco = Math.min(NISA_LIFETIME_LIMIT, nisaCumWithIdeco + nisaAnnual);
         nisaWithIdecoReached = nisaCumWithIdeco >= NISA_LIFETIME_LIMIT;
       }
     }

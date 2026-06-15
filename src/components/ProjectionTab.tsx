@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import type { Assumptions, ProjectionResult } from '../lib/types';
+import { useMemo, useState } from 'react';
+import type { Assumptions, ProjectionResult, ProjectionRow } from '../lib/types';
 import { runProjection } from '../lib/projection';
 import { formatMan } from '../lib/format';
 import { ProjectionChart } from './Charts/ProjectionChart';
@@ -17,12 +17,38 @@ function ageStr(v: number | null): string {
   return v !== null ? `${v}歳` : '—';
 }
 
+/** 各行の金額を「今の物価」に割り戻した結果を返す（名目→実質） */
+function toRealResult(result: ProjectionResult, currentAge: number, inflation: number): ProjectionResult {
+  const scale = (r: ProjectionRow): ProjectionRow => {
+    const f = Math.pow(1 + inflation, r.age - currentAge);
+    if (f === 0 || !Number.isFinite(f)) return r;
+    return {
+      ...r,
+      cash: r.cash / f,
+      invConservative: r.invConservative / f,
+      invBase: r.invBase / f,
+      invOptimistic: r.invOptimistic / f,
+      totalConservative: r.totalConservative / f,
+      totalBase: r.totalBase / f,
+      totalOptimistic: r.totalOptimistic / f,
+      lockedIdeco: r.lockedIdeco / f,
+      refundPool: r.refundPool / f,
+      totalWithIdeco: r.totalWithIdeco / f,
+      liquid: r.liquid / f,
+    };
+  };
+  return { ...result, rows: result.rows.map(scale) };
+}
+
 /* ---- 結論: ヒーロー ---- */
-function Hero({ result, a }: { result: ProjectionResult; a: Assumptions }) {
+function Hero({ result, a, real }: { result: ProjectionResult; a: Assumptions; real: boolean }) {
   const last = result.rows[result.rows.length - 1];
   return (
     <div className="hero-result">
-      <div className="hero-label">{a.endAge}歳時点の予想総資産（基準シナリオ）</div>
+      <div className="hero-label">
+        {a.endAge}歳時点の予想総資産（基準シナリオ）
+        {real && <span className="real-badge">実質・今の物価</span>}
+      </div>
       <div className="hero-value">{man(last.totalBase)}円</div>
       <div className="hero-range">
         <span className="chip cons"><i className="dot cons" />保守 {man(last.totalConservative)}</span>
@@ -88,7 +114,7 @@ function Milestones({ result, a, onChange }: { result: ProjectionResult; a: Assu
 }
 
 /* ---- iDeCoパネル ---- */
-function IdecoPanel({ result, a }: { result: ProjectionResult; a: Assumptions }) {
+function IdecoPanel({ result, a, real }: { result: ProjectionResult; a: Assumptions; real: boolean }) {
   const last = result.rows[result.rows.length - 1];
   const display = result.rows.find((r) => r.age === 60) ?? last;
   const lockedMan = display.lockedIdeco / 10000;
@@ -97,7 +123,7 @@ function IdecoPanel({ result, a }: { result: ProjectionResult; a: Assumptions })
 
   return (
     <div className="card">
-      <h2>iDeCoの効果（{a.endAge}歳時点・基準）</h2>
+      <h2>iDeCoの効果（{a.endAge}歳時点・基準{real ? '・実質' : ''}）</h2>
       <p className="panel-intro">
         iDeCoは60歳まで引き出せない代わりに、掛金が所得控除になり節税できます。資産は「いつでも使える流動分」と「60歳までロックされる分」に分かれます。
       </p>
@@ -107,25 +133,25 @@ function IdecoPanel({ result, a }: { result: ProjectionResult; a: Assumptions })
       </div>
       <div className="metric-grid">
         <div className="metric">
-          <div className="m-label">節税還付プール <span className="m-tag plus">純増</span></div>
+          <div className="m-label">節税還付プール <span className="m-tag plus">節税分</span></div>
           <div className="m-value">{man(display.refundPool / 10000)}円</div>
-          <div className="m-sub">節税ぶんを再投資した累積。これがiDeCo固有のメリット。</div>
+          <div className="m-sub">掛金控除で戻った税を再投資した累積（運用とは別の上乗せ）。ただし下記の出口課税で一部目減りします。</div>
         </div>
         <div className="metric">
           <div className="m-label">iDeCo込み総資産</div>
           <div className="m-value">{man(display.totalWithIdeco)}円</div>
-          <div className="m-sub">基準の総資産＋還付プール。</div>
+          <div className="m-sub">基準の総資産＋還付プール（出口課税前）。</div>
         </div>
       </div>
       <p className="note">
-        ※ iDeCo拠出は毎月の投資額の「内数」。ロック額は総資産に含まれます（二重計上なし）。出口課税（退職所得控除等）は未計上。
+        ※ iDeCo拠出は毎月の投資額の「内数」。ロック額は総資産に含まれます（二重計上なし）。<b>受取時には課税</b>され（退職所得控除・公的年金等控除で軽減）、ここでは未計上のため節税メリットは上限値です。実際の手取りはこれより小さくなります。
       </p>
     </div>
   );
 }
 
 /* ---- 詳細: 年次テーブル ---- */
-function ProjectionTable({ result, a }: { result: ProjectionResult; a: Assumptions }) {
+function ProjectionTable({ result, a, real }: { result: ProjectionResult; a: Assumptions; real: boolean }) {
   const { rows, goalA, goalB } = result;
 
   const goalAges = new Set([
@@ -135,7 +161,7 @@ function ProjectionTable({ result, a }: { result: ProjectionResult; a: Assumptio
 
   return (
     <div className="card">
-      <h2>年ごとの詳細（単位：万円）</h2>
+      <h2>年ごとの詳細（単位：万円{real ? '・実質' : ''}）</h2>
       <p className="panel-intro">
         各行は<b>その年齢の年末時点</b>。<span className="lg lg-now">この色</span>＝現在 ／ <span className="lg lg-goal">この色</span>＝3,000万・5,000万の到達年。
         グレーの2列は「総資産の内訳」、右の3色が<b>総資産</b>です。
@@ -191,18 +217,37 @@ function ProjectionTable({ result, a }: { result: ProjectionResult; a: Assumptio
 }
 
 export function ProjectionTab({ assumptions, onChange }: Props) {
-  const result = useMemo(() => runProjection(assumptions), [assumptions]);
+  const [real, setReal] = useState(false);
+  const nominal = useMemo(() => runProjection(assumptions), [assumptions]);
+  // 実質表示時は名目結果を「今の物価」に割り戻す（目標到達年齢は名目のまま）
+  const display = useMemo(
+    () => (real ? toRealResult(nominal, assumptions.currentAge, assumptions.inflationRate) : nominal),
+    [real, nominal, assumptions.currentAge, assumptions.inflationRate],
+  );
 
   return (
     <div className="content-panel">
-      <Hero result={result} a={assumptions} />
-      <Milestones result={result} a={assumptions} onChange={onChange} />
-      <div className="card">
-        <h2>資産はどう増える？（年齢ごとの総資産）</h2>
-        <ProjectionChart rows={result.rows} idecoEnabled={assumptions.idecoEnabled} />
+      <div className="view-toggle">
+        <label className="switch">
+          <input type="checkbox" checked={real} onChange={(e) => setReal(e.target.checked)}
+            aria-label="実質値（今の物価に換算）で表示" />
+          <span className="track" />
+          <span className="switch-label">
+            実質値で表示（今の物価・年{(assumptions.inflationRate * 100).toFixed(1)}%インフレ前提）
+          </span>
+        </label>
+        <span className="view-toggle-hint">
+          {real ? '将来の金額を今日の購買力に換算中' : '名目値（将来の額面）を表示中'}
+        </span>
       </div>
-      {assumptions.idecoEnabled && <IdecoPanel result={result} a={assumptions} />}
-      <ProjectionTable result={result} a={assumptions} />
+      <Hero result={display} a={assumptions} real={real} />
+      <Milestones result={nominal} a={assumptions} onChange={onChange} />
+      <div className="card">
+        <h2>資産はどう増える？（年齢ごとの総資産{real ? '・実質' : ''}）</h2>
+        <ProjectionChart rows={display.rows} idecoEnabled={assumptions.idecoEnabled} />
+      </div>
+      {assumptions.idecoEnabled && <IdecoPanel result={display} a={assumptions} real={real} />}
+      <ProjectionTable result={display} a={assumptions} real={real} />
     </div>
   );
 }

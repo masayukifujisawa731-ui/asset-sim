@@ -80,5 +80,6 @@ export function sanitizeAssumptions(raw: unknown): Assumptions {
     rConservative: num(r.rConservative, d.rConservative, -0.99, 1),
     rBase: num(r.rBase, d.rBase, -0.99, 1),
     rOptimistic: num(r.rOptimistic, d.rOptimistic, -0.99, 1),
+    inflationRate: num(r.inflationRate, d.inflationRate, -0.5, 1),
   };
 }

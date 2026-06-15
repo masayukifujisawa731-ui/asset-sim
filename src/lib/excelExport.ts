@@ -114,6 +114,7 @@ function buildAssumptions(wb: ExcelJS.Workbook, a: Assumptions) {
   kv('保守シナリオ', (a.rConservative * 100).toFixed(1), '%');
   kv('基準シナリオ', (a.rBase * 100).toFixed(1), '%');
   kv('楽観シナリオ', (a.rOptimistic * 100).toFixed(1), '%');
+  kv('想定インフレ率（実質換算用）', (a.inflationRate * 100).toFixed(1), '%');
   ws.addRow([]);
 
   sectionTitle(ws, '■ iDeCo');
