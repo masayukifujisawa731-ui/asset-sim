@@ -12,11 +12,12 @@ const cspPlugin: Plugin = {
   name: 'inject-csp',
   apply: 'build',
   transformIndexHtml(html) {
+    // 注: frame-ancestors / sandbox / report-uri は <meta> では無視される（HTTPヘッダー専用）。
+    // クリックジャッキング対策が必要なら配信側で frame-ancestors か X-Frame-Options を設定する。
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
       "object-src 'none'",
-      "frame-ancestors 'none'",
       "script-src 'self'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
