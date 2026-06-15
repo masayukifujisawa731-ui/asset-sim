@@ -23,7 +23,7 @@ export function AssumptionsForm({ value, onChange }: Props) {
 
       <div className="form-section">
         <h3>基本情報</h3>
-        <IntField label="現在の年齢" value={value.currentAge} onChange={(v) => set('currentAge', v)} min={20} max={70} unit="歳" />
+        <IntField label="現在の年齢" value={value.currentAge} onChange={(v) => set('currentAge', v)} min={20} max={Math.min(70, value.endAge - 1)} unit="歳" />
         <IntField label="シミュレーション終了年齢" value={value.endAge} onChange={(v) => set('endAge', v)} min={value.currentAge + 1} max={90} unit="歳" />
         <PlainNumField label="現在の西暦" value={value.currentYear} onChange={(v) => set('currentYear', v)} unit="年" />
       </div>

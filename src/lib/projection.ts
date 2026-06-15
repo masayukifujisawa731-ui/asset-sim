@@ -2,8 +2,14 @@ import { NISA_LIFETIME_LIMIT, NISA_INITIAL_CONSUMED, getIdecoMonthlyByYear } fro
 import type { Assumptions, ProjectionRow, ProjectionResult, GoalAge } from './types';
 
 function fvCoeff(r: number): number {
-  if (r === 0) return 12;
-  const i = Math.pow(1 + r, 1 / 12) - 1;
+  // 1+r ≤ 0 だと月利が定義できない。元本全損相当の非現実領域なので
+  // 月次積立は年内据え置き（係数12）に縮退させ、NaN伝播を防ぐ。
+  if (1 + r <= 0) return 12;
+  // 月利 i = (1+r)^(1/12) - 1。pow(...)-1 はゼロ近傍で桁落ちするため
+  // log1p/expm1 で安定に計算する（極小 r でも精度・単調性を保つ）。
+  const i = Math.expm1(Math.log1p(r) / 12);
+  // r=0 など i=0 では r/i が Infinity。月利ゼロの極限の係数 12 に縮退。
+  if (i === 0) return 12;
   return r / i;
 }
 
@@ -21,6 +27,10 @@ export function runProjection(a: Assumptions): ProjectionResult {
   const fvB = fvCoeff(a.rBase);
   const fvO = fvCoeff(a.rOptimistic);
 
+  // endAge < currentAge でも最低1行（現在年齢）を返し、呼び出し側の
+  // rows[rows.length-1] 参照がクラッシュしないようにする。
+  const endAge = Math.max(a.endAge, a.currentAge);
+
   const rows: ProjectionRow[] = [];
 
   let cash = a.startCash;
@@ -34,7 +44,7 @@ export function runProjection(a: Assumptions): ProjectionResult {
   let nisaFullReached = nisaCumNoIdeco >= NISA_LIFETIME_LIMIT;
   let nisaWithIdecoReached = nisaCumWithIdeco >= NISA_LIFETIME_LIMIT;
 
-  for (let age = a.currentAge; age <= a.endAge; age++) {
+  for (let age = a.currentAge; age <= endAge; age++) {
     const t = age - a.currentAge;
     const year = a.currentYear + t;
 

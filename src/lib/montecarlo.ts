@@ -34,8 +34,11 @@ function makeGauss(rand: () => number) {
 
 // 対数正規パラメータ計算
 function lognormalParams(aEff: number, sdEff: number) {
-  const v = Math.log(1 + (sdEff * sdEff) / ((1 + aEff) * (1 + aEff)));
-  const m = Math.log(1 + aEff) - v / 2;
+  // 1+aEff ≤ 0（実効リターン −100%以下）は対数正規の前提を満たさない。
+  // log/除算が NaN/Infinity になるため、実効的な下限近傍にクランプする。
+  const base = Math.max(1 + aEff, 1e-9);
+  const v = Math.log(1 + (sdEff * sdEff) / (base * base));
+  const m = Math.log(base) - v / 2;
   const s = Math.sqrt(v);
   return { m, s };
 }
@@ -66,10 +69,11 @@ function runPaths(
 ): number[][] {
   const gauss = makeGauss(rand ?? Math.random);
   const { m, s } = lognormalParams(aEff, sdEff);
-  const steps = p.ageN - p.age0 + 1; // 含む: 開始〜終了年齢
+  const steps = Math.max(1, p.ageN - p.age0 + 1); // 含む: 開始〜終了年齢（最低1）
+  const nPaths = Math.max(1, Math.floor(p.nPaths)); // パーセンタイル計算のため最低1本
   const allPaths: number[][] = [];
 
-  for (let path = 0; path < p.nPaths; path++) {
+  for (let path = 0; path < nPaths; path++) {
     let W = p.startW;
     const record: number[] = [];
     for (let y = 0; y < steps; y++) {
@@ -122,7 +126,7 @@ export function runMonteCarlo(p: MCParams, seed?: number): MCResult {
   const { m } = lognormalParams(aEff, sdEff);
   const geomMean = Math.exp(m) - 1;
 
-  const steps = p.ageN - p.age0 + 1;
+  const steps = Math.max(1, p.ageN - p.age0 + 1);
   const ages = Array.from({ length: steps }, (_, i) => p.age0 + i);
 
   const allPaths = runPaths(p, aEff, sdEff, rand);
@@ -166,7 +170,7 @@ export function runStrategyComparison(base: MCParams, seed?: number): StrategyRe
     const rand = seed !== undefined ? mulberry32(seed + i * 999_999) : null;
     const aEff = p.muArith;
     const sdEff = p.sigma;
-    const steps = p.ageN - p.age0 + 1;
+    const steps = Math.max(1, p.ageN - p.age0 + 1);
     const allPaths = runPaths(p, aEff, sdEff, rand);
     const pc = collectPercentiles(allPaths, steps);
     const finalIdx = steps - 1;

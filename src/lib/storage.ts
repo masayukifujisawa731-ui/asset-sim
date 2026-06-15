@@ -1,24 +1,21 @@
 import type { Assumptions } from './types';
 import { createDefaultAssumptions } from './constants';
+import { sanitizeAssumptions } from './sanitize';
 
 const KEY = 'asset-sim:assumptions:v1';
 
 /**
  * 保存済みの前提を読み込む。
- * 既定値に対して保存値を上書きマージするため、将来フィールドが増えても
- * 欠けたキーは既定値で補完され壊れない。
+ * 保存値は型・範囲・相互制約をサニタイズして返すため、壊れた/古い/手で
+ * 書き換えられたデータでも計算が NaN・クラッシュしない。
  */
 export function loadAssumptions(): Assumptions {
-  const base = createDefaultAssumptions();
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return base;
-    const saved = JSON.parse(raw) as Partial<Assumptions>;
-    if (!saved || typeof saved !== 'object') return base;
-    // 配列・スカラーともにトップレベルの上書きで十分（ネストしたオブジェクトは無い）
-    return { ...base, ...saved };
+    if (!raw) return createDefaultAssumptions();
+    return sanitizeAssumptions(JSON.parse(raw));
   } catch {
-    return base;
+    return createDefaultAssumptions();
   }
 }
 
