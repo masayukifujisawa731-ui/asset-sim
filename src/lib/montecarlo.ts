@@ -136,12 +136,23 @@ export function runMonteCarlo(p: MCParams, seed?: number): MCResult {
   const medianAt60 = percentiles.p50[finalIdx];
   const p10At60 = percentiles.p10[finalIdx];
 
+  // 判定年齢は希望値(45/50/55)を年齢レンジ [age0+1, ageN] に収める。
+  // 現在年齢が高い場合でも常に「将来の」有効な年齢になる。
+  const pick = (preferred: number) =>
+    Math.min(p.ageN, Math.max(Math.min(p.age0 + 1, p.ageN), preferred));
+  const probAgeA = pick(45);
+  const probAgeB1 = pick(50);
+  const probAgeB2 = pick(55);
+
   return {
     ages,
     percentiles,
-    prob50B: probAtAge(allPaths, p.age0, 50, p.targetB),
-    prob55B: probAtAge(allPaths, p.age0, 55, p.targetB),
-    prob45A: probAtAge(allPaths, p.age0, 45, p.targetA),
+    probAgeA,
+    probAgeB1,
+    probAgeB2,
+    probA: probAtAge(allPaths, p.age0, probAgeA, p.targetA),
+    probB1: probAtAge(allPaths, p.age0, probAgeB1, p.targetB),
+    probB2: probAtAge(allPaths, p.age0, probAgeB2, p.targetB),
     medianAt60,
     p10At60,
     geomMean,

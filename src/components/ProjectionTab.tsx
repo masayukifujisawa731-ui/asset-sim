@@ -163,7 +163,7 @@ function ProjectionTable({ result, a, real }: { result: ProjectionResult; a: Ass
     <div className="card">
       <h2>年ごとの詳細（単位：万円{real ? '・実質' : ''}）</h2>
       <p className="panel-intro">
-        各行は<b>その年齢の年末時点</b>。<span className="lg lg-now">この色</span>＝現在 ／ <span className="lg lg-goal">この色</span>＝3,000万・5,000万の到達年。
+        各行は<b>その年齢の年末時点</b>。<span className="lg lg-now">この色</span>＝現在 ／ <span className="lg lg-goal">この色</span>＝{a.targetA.toLocaleString()}万・{a.targetB.toLocaleString()}万の到達年。
         グレーの2列は「総資産の内訳」、右の3色が<b>総資産</b>です。
       </p>
       <div className="table-wrap">

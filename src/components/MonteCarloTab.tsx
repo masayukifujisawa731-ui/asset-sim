@@ -148,16 +148,16 @@ export function MonteCarloTab({ assumptions: a }: Props) {
         <h2>目標に届く確率</h2>
         <div className="mc-cards">
           <div className="mc-card">
-            <div className="label">45歳で {a.targetA.toLocaleString()}万 以上</div>
-            <div className="value">{pct(result.prob45A)}</div>
+            <div className="label">{result.probAgeA}歳で {a.targetA.toLocaleString()}万 以上</div>
+            <div className="value">{pct(result.probA)}</div>
           </div>
           <div className="mc-card">
-            <div className="label">50歳で {a.targetB.toLocaleString()}万 以上</div>
-            <div className="value">{pct(result.prob50B)}</div>
+            <div className="label">{result.probAgeB1}歳で {a.targetB.toLocaleString()}万 以上</div>
+            <div className="value">{pct(result.probB1)}</div>
           </div>
           <div className="mc-card">
-            <div className="label">55歳で {a.targetB.toLocaleString()}万 以上</div>
-            <div className="value">{pct(result.prob55B)}</div>
+            <div className="label">{result.probAgeB2}歳で {a.targetB.toLocaleString()}万 以上</div>
+            <div className="value">{pct(result.probB2)}</div>
           </div>
         </div>
         <p className="note" style={{ marginTop: 6 }}>数千回の試算のうち、その年齢で目標額に届いた割合。</p>

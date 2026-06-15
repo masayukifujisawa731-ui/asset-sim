@@ -28,6 +28,8 @@ export function Field({
   value, onChange, unit, stepFine, stepCoarse, min, max,
   decimals, slider, sliderMin = 0, sliderMax = 100, sliderStep, compact, ariaLabel,
 }: FieldProps) {
+  // value が NaN/undefined だと数値入力が空欄表示になるため安全側に矯正
+  const safe = Number.isFinite(value) ? value : (min ?? 0);
   const dec = decimals ?? (stepFine < 1 ? 1 : 0);
   const clamp = (n: number) => {
     let r = Number(n.toFixed(dec));
@@ -35,7 +37,7 @@ export function Field({
     if (max != null) r = Math.min(max, r);
     return r;
   };
-  const bump = (d: number) => onChange(clamp(value + d));
+  const bump = (d: number) => onChange(clamp(safe + d));
 
   return (
     <div className={`field-ctl${compact ? ' compact' : ''}`}>
@@ -48,7 +50,7 @@ export function Field({
           aria-label={`${stepFine}減らす`}>{compact ? '−' : `−${lbl(stepFine)}`}</button>
         <div className="num-box">
           <NumInput
-            value={Number(value.toFixed(dec))}
+            value={Number(safe.toFixed(dec))}
             step={stepFine}
             min={min}
             max={max}
@@ -67,7 +69,7 @@ export function Field({
       {slider && (
         <input type="range" className="ctl-slider"
           min={sliderMin} max={sliderMax} step={sliderStep ?? stepFine}
-          value={Math.min(sliderMax, Math.max(sliderMin, value))}
+          value={Math.min(sliderMax, Math.max(sliderMin, safe))}
           onChange={(e) => onChange(clamp(Number(e.target.value)))} aria-label={ariaLabel} />
       )}
     </div>

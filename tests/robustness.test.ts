@@ -137,7 +137,7 @@ describe('robustness — montecarlo の不変条件', () => {
     fc.assert(
       fc.property(mcParamsArb, (p) => {
         const res = runMonteCarlo(p, 42);
-        for (const prob of [res.prob45A, res.prob50B, res.prob55B]) {
+        for (const prob of [res.probA, res.probB1, res.probB2]) {
           expect(prob).toBeGreaterThanOrEqual(0);
           expect(prob).toBeLessThanOrEqual(1);
         }

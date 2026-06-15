@@ -110,12 +110,16 @@ export interface MCPercentiles {
 export interface MCResult {
   ages: number[];
   percentiles: MCPercentiles;
-  prob50B: number;   // 50歳で targetB 以上
-  prob55B: number;   // 55歳で targetB 以上
-  prob45A: number;   // 45歳で targetA 以上
+  // 確率の判定年齢は年齢レンジに合わせて算出（固定45/50/55ではない）
+  probAgeA: number;  // targetA を判定する年齢
+  probAgeB1: number; // targetB を判定する早めの年齢
+  probAgeB2: number; // targetB を判定する遅めの年齢
+  probA: number;     // probAgeA 時点で targetA 以上
+  probB1: number;    // probAgeB1 時点で targetB 以上
+  probB2: number;    // probAgeB2 時点で targetB 以上
   medianAt60: number;
   p10At60: number;
-  geomMean: number; // 実質複利(中央値) = exp(m)-1
+  geomMean: number; // 複利利回り(中央値) = exp(m)-1
 }
 
 export interface StrategyResult {
