@@ -323,6 +323,9 @@ input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color:
   border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 12px;
 }
 .btn-reset:hover { color: var(--text); border-color: var(--muted); }
+.form-actions { display: flex; gap: 8px; }
+.form-actions .btn-reset { flex: 1; }
+.btn-danger:hover { color: var(--red); border-color: var(--red); }
 
 /* ---- タブA 表示の再設計 ---- */
 

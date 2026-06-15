@@ -1,73 +1,29 @@
-# React + TypeScript + Vite
+# 資産形成シミュレーター
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+iDeCo・NISA に対応した個人向けの資産形成シミュレーター（ローカルWebアプリ）。
 
-Currently, two official plugins are available:
+- **資産推移タブ**：保守／基準／楽観の3シナリオで年次の資産推移を試算。実質値（インフレ調整）表示にも対応。
+- **ふれ幅シミュレーションタブ**：モンテカルロ法で結果のばらつき（ファンチャート）と目標到達確率を表示。
+- 入力（前提条件・ライフイベント・大型出費・目標額）を編集すると即時に再計算。
+- 試算結果を Excel（.xlsx／4シート）でダウンロード可能。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 開発
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # 開発サーバー
+npm test         # ユニット／プロパティテスト（Vitest）
+npm run build    # 本番ビルド
+npm run lint     # ESLint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## プライバシー / セキュリティ
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **完全ローカル動作**：外部API・CDN・Webフォント・解析ツールへの通信は一切ありません（システムフォントのみ使用）。
+- **データの保存先**：入力内容はブラウザの `localStorage` にのみ保存され、外部送信されません。フォーム下部の「保存データを消去」でいつでも削除できます。
+- **CSP**：本番ビルドの HTML には Content-Security-Policy を注入し、外部スクリプト・通信を禁止しています（開発時は HMR のため未適用）。
+- **依存の脆弱性**：`npm audit` で `exceljs` の内部依存 `uuid` に moderate 勧告（GHSA-w5hq-g745-h8pq）が出ますが、これは `uuid` に `buf` 引数を渡す使い方で発生するもので、本アプリ（exceljs が内部的にID生成に使うのみ）では**該当しません**。修正には exceljs のメジャーダウングレード（破壊的変更）が必要なため、現状は受容しています。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 免責
+
+本ツールは一般的な試算であり投資助言ではありません。利回りは名目値（インフレ控除なし）、iDeCo の出口課税（退職所得控除・公的年金等控除）は未計上です。実際の運用成果を保証するものではありません。

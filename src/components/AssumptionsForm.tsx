@@ -1,5 +1,6 @@
 import type { Assumptions } from '../lib/types';
 import { createDefaultAssumptions } from '../lib/constants';
+import { clearAssumptions } from '../lib/storage';
 import { IntField, MoneyField, PlainNumField, RateField } from './AssumptionFields';
 import { BigExpenseEditor, LifeEventEditor } from './EventEditors';
 
@@ -125,11 +126,24 @@ export function AssumptionsForm({ value, onChange }: Props) {
         </div>
       </details>
 
-      <button className="btn-reset" onClick={() => onChange(createDefaultAssumptions())}>
-        既定値にリセット
-      </button>
+      <div className="form-actions">
+        <button className="btn-reset" onClick={() => onChange(createDefaultAssumptions())}>
+          既定値にリセット
+        </button>
+        <button
+          className="btn-reset btn-danger"
+          onClick={() => {
+            if (confirm('このブラウザに保存した入力データを消去し、既定値に戻します。よろしいですか？')) {
+              clearAssumptions();
+              onChange(createDefaultAssumptions());
+            }
+          }}
+        >
+          保存データを消去
+        </button>
+      </div>
       <p className="note" style={{ textAlign: 'center', marginTop: 6 }}>
-        入力内容はこのブラウザに自動保存され、次回開いたときに復元されます。
+        入力内容は<b>このブラウザにのみ</b>自動保存され、外部に送信されません。次回開くと復元されます。
       </p>
     </div>
   );
