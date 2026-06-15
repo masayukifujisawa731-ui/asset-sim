@@ -36,6 +36,8 @@ export function AssumptionsForm({ value, onChange }: Props) {
           sliderMax={3000} stepFine={10} stepCoarse={100} />
         <MoneyField label="生活防衛ライン（下限の目安）" hint="現金がこの額を下回ると表で赤く表示します。"
           valueYen={value.cashFloor} onChange={(v) => set('cashFloor', v)} sliderMax={1000} stepFine={10} stepCoarse={100} />
+        <MoneyField label="NISAで既に使った枠" hint="開始時点までに使ったNISA生涯枠（1,800万のうち）。新規スタートなら0。「NISA使い切り年齢」の計算に使います。"
+          valueYen={value.nisaUsedAtStart} onChange={(v) => set('nisaUsedAtStart', v)} sliderMax={1800} stepFine={10} stepCoarse={100} />
       </div>
 
       <div className="form-section">

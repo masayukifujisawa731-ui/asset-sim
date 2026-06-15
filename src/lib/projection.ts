@@ -1,4 +1,4 @@
-import { NISA_LIFETIME_LIMIT, NISA_ANNUAL_LIMIT, NISA_INITIAL_CONSUMED, getIdecoMonthlyByYear } from './constants';
+import { NISA_LIFETIME_LIMIT, NISA_ANNUAL_LIMIT, getIdecoMonthlyByYear } from './constants';
 import type { Assumptions, ProjectionRow, ProjectionResult, GoalAge } from './types';
 
 function fvCoeff(r: number): number {
@@ -39,8 +39,9 @@ export function runProjection(a: Assumptions): ProjectionResult {
   let invO = a.startSecurities;
   let lockedIdeco = 0;
   let refundPool = 0;
-  let nisaCumNoIdeco = NISA_INITIAL_CONSUMED;
-  let nisaCumWithIdeco = NISA_INITIAL_CONSUMED;
+  const nisaUsed = Math.min(Math.max(0, a.nisaUsedAtStart), NISA_LIFETIME_LIMIT);
+  let nisaCumNoIdeco = nisaUsed;
+  let nisaCumWithIdeco = nisaUsed;
   let nisaFullReached = nisaCumNoIdeco >= NISA_LIFETIME_LIMIT;
   let nisaWithIdecoReached = nisaCumWithIdeco >= NISA_LIFETIME_LIMIT;
 

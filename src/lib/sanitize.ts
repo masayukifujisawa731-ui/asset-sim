@@ -1,5 +1,5 @@
 import type { Assumptions, LifeEvent, BigExpense } from './types';
-import { createDefaultAssumptions } from './constants';
+import { createDefaultAssumptions, NISA_LIFETIME_LIMIT } from './constants';
 
 /** 有限数なら返し、そうでなければ fallback。範囲があればクランプ。 */
 function num(v: unknown, fallback: number, min?: number, max?: number): number {
@@ -65,6 +65,7 @@ export function sanitizeAssumptions(raw: unknown): Assumptions {
     startSecurities: num(r.startSecurities, d.startSecurities, 0),
     startCash: num(r.startCash, d.startCash, 0),
     cashFloor: num(r.cashFloor, d.cashFloor, 0),
+    nisaUsedAtStart: num(r.nisaUsedAtStart, d.nisaUsedAtStart, 0, NISA_LIFETIME_LIMIT),
     takeHomeMonthly: num(r.takeHomeMonthly, d.takeHomeMonthly, 0),
     annualBonus: num(r.annualBonus, d.annualBonus, 0),
     expenseMonthly: num(r.expenseMonthly, d.expenseMonthly, 0),

@@ -96,6 +96,7 @@ function buildAssumptions(wb: ExcelJS.Workbook, a: Assumptions) {
   kv('証券口座（NISA含む合計）', man(a.startSecurities), '万円');
   kv('現金・預金', man(a.startCash), '万円');
   kv('生活防衛ライン', man(a.cashFloor), '万円');
+  kv('NISAで既に使った枠', man(a.nisaUsedAtStart), '万円');
   ws.addRow([]);
 
   sectionTitle(ws, '■ 毎月の収支（万円）');

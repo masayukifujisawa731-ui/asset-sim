@@ -18,6 +18,7 @@ const assumptionsArb: fc.Arbitrary<Assumptions> = fc.record({
   startSecurities: fc.integer({ min: 0, max: 200_000_000 }),
   startCash: fc.integer({ min: 0, max: 200_000_000 }),
   cashFloor: fc.integer({ min: 0, max: 50_000_000 }),
+  nisaUsedAtStart: fc.integer({ min: 0, max: 18_000_000 }),
   takeHomeMonthly: fc.integer({ min: 0, max: 3_000_000 }),
   annualBonus: fc.integer({ min: 0, max: 20_000_000 }),
   expenseMonthly: fc.integer({ min: 0, max: 3_000_000 }),

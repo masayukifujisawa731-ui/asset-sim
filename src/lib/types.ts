@@ -24,6 +24,7 @@ export interface Assumptions {
   startSecurities: number;
   startCash: number;
   cashFloor: number;
+  nisaUsedAtStart: number;    // 開始時点で既に使ったNISA生涯枠 (円)
   takeHomeMonthly: number;
   annualBonus: number;        // 円/年 手取りボーナス(現金へ積み上げ)
   expenseMonthly: number;     // 基準の月支出
