@@ -223,6 +223,14 @@ input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color:
 
 .note { font-size: 10px; color: var(--muted); margin-top: 4px; }
 
+/* スクリーンリーダー専用（視覚的に隠す） */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+/* 防衛ライン割れの色以外の手がかり */
+.warn-mark { color: var(--red); font-size: 9px; margin-right: 3px; }
+
 /* タブAと共有する前提の確認ストリップ（MCタブ） */
 .shared-strip {
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px;

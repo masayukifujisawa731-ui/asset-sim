@@ -24,6 +24,7 @@ interface Props {
 export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
   const labels = rows.map((r) => `${r.age}歳`);
 
+  // 色だけに依存しないよう、シナリオごとに線種（実線/破線/点線）も変える
   const data = {
     labels,
     datasets: [
@@ -33,6 +34,8 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
         borderColor: '#4fc97a',
         backgroundColor: 'transparent',
         borderWidth: 1.5,
+        borderDash: [] as number[],
+        pointStyle: 'triangle',
         pointRadius: 0,
         tension: 0.3,
       },
@@ -41,7 +44,9 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
         data: rows.map((r) => Math.round(r.totalBase)),
         borderColor: '#4f8ef7',
         backgroundColor: 'transparent',
-        borderWidth: 2,
+        borderWidth: 2.5,
+        borderDash: [] as number[],
+        pointStyle: 'circle',
         pointRadius: 0,
         tension: 0.3,
       },
@@ -51,6 +56,8 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
         borderColor: '#f7934f',
         backgroundColor: 'transparent',
         borderWidth: 1.5,
+        borderDash: [7, 4],
+        pointStyle: 'rect',
         pointRadius: 0,
         tension: 0.3,
       },
@@ -61,7 +68,8 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
             borderColor: '#c44ff7',
             backgroundColor: 'transparent',
             borderWidth: 1.5,
-            borderDash: [4, 3],
+            borderDash: [2, 3],
+            pointStyle: 'rectRot',
             pointRadius: 0,
             tension: 0.3,
           }]
@@ -74,7 +82,7 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        labels: { color: '#7f8599', font: { size: 11 } },
+        labels: { color: '#7f8599', font: { size: 11 }, usePointStyle: true },
       },
       tooltip: {
         callbacks: {
@@ -105,9 +113,18 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
     },
   };
 
+  const first = rows[0];
+  const last = rows[rows.length - 1];
+  const summary =
+    `${first?.age ?? ''}歳から${last?.age ?? ''}歳までの総資産推移グラフ（保守・基準・楽観の3シナリオ`
+    + `${idecoEnabled ? '＋iDeCo込み' : ''}）。`
+    + `基準シナリオは${first?.age ?? ''}歳で約${formatMan(Math.round(first?.totalBase ?? 0), 0, 2)}円から`
+    + `${last?.age ?? ''}歳で約${formatMan(Math.round(last?.totalBase ?? 0), 0, 2)}円へ。`
+    + '正確な数値は下の年次テーブルを参照してください。';
+
   return (
-    <div className="chart-wrap">
-      <Line data={data} options={options} />
+    <div className="chart-wrap" role="img" aria-label={summary}>
+      <Line data={data} options={options} aria-hidden="true" />
     </div>
   );
 }

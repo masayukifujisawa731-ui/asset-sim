@@ -94,14 +94,14 @@ export function FanChart({ result, targetA, targetB }: Props) {
         pointRadius: 0,
         order: 2,
       },
-      // 目標線B
+      // 目標線B（Aと線種を変え、色覚に依存せず区別できるようにする）
       {
         label: `${targetB.toLocaleString()}万目標`,
         data: Array(ages.length).fill(targetB),
         borderColor: '#f75f5f',
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderDash: [6, 3],
+        borderDash: [2, 2],
         pointRadius: 0,
         order: 3,
       },
@@ -143,9 +143,18 @@ export function FanChart({ result, targetA, targetB }: Props) {
     },
   };
 
+  const lastAge = ages[ages.length - 1];
+  const li = percentiles.p50.length - 1;
+  const summary =
+    `${ages[0]}歳から${lastAge}歳までの資産のばらつきを示すファンチャート。`
+    + `${lastAge}歳時点で、中央値 約${formatMan(Math.round(percentiles.p50[li]), 0, 2)}円、`
+    + `下位10% 約${formatMan(Math.round(percentiles.p10[li]), 0, 2)}円、`
+    + `上位10% 約${formatMan(Math.round(percentiles.p90[li]), 0, 2)}円。`
+    + `目標は ${targetA.toLocaleString()}万・${targetB.toLocaleString()}万。`;
+
   return (
-    <div className="chart-wrap">
-      <Line data={data} options={options} />
+    <div className="chart-wrap" role="img" aria-label={summary}>
+      <Line data={data} options={options} aria-hidden="true" />
     </div>
   );
 }

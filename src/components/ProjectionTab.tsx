@@ -196,6 +196,9 @@ function ProjectionTable({ result, a, real }: { result: ProjectionResult; a: Ass
                     <span className="year-sub">{r.year}</span>
                   </td>
                   <td className="muted" style={{ color: r.cash < a.cashFloor ? 'var(--red)' : undefined }}>
+                    {r.cash < a.cashFloor && (
+                      <span className="warn-mark" title="生活防衛ラインを下回っています" aria-label="防衛ライン割れ">▼</span>
+                    )}
                     {Math.round(r.cash / 10000).toLocaleString()}
                   </td>
                   <td className="muted">{Math.round(r.invBase / 10000).toLocaleString()}</td>
