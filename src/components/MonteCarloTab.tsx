@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import type { Assumptions, MCParams } from '../lib/types';
 import { runMonteCarlo, runStrategyComparison } from '../lib/montecarlo';
 import { formatMan, formatPct } from '../lib/format';
+import { useDebounced } from '../hooks/useDebounced';
 import { FanChart } from './Charts/FanChart';
 import { Field } from './Field';
 
@@ -62,8 +63,12 @@ export function MonteCarloTab({ assumptions: a }: Props) {
     targetB: a.targetB,
   }), [muArith, sigma, leverage, monthlyMan, idecoReinvest, a]);
 
-  const result = useMemo(() => runMonteCarlo(params), [params]);
-  const strategies = useMemo(() => runStrategyComparison(params), [params]);
+  // 重い計算(~66ms)はスライダー連射のたびに走らせず、手を止めてから実行する。
+  // コントロールの値は即時更新され、結果だけ少し遅れて追従する。
+  const debouncedParams = useDebounced(params, 200);
+  const pending = debouncedParams !== params;
+  const result = useMemo(() => runMonteCarlo(debouncedParams), [debouncedParams]);
+  const strategies = useMemo(() => runStrategyComparison(debouncedParams), [debouncedParams]);
 
   const reset = () => {
     setMuArith(7.5); setSigma(18); setLeverage(1.0);
@@ -93,7 +98,7 @@ export function MonteCarloTab({ assumptions: a }: Props) {
 
       {/* Controls */}
       <div className="card">
-        <h2>前提を調整</h2>
+        <h2>前提を調整{pending && <span className="calc-pending" aria-live="polite"> · 結果を更新中…</span>}</h2>
         <div className="mc-controls">
           <Control label="期待リターン（年・平均）" hint="1年あたり平均で何%増えるか。世界株インデックスで概ね5〜8%。"
             value={muArith} onChange={setMuArith} min={3} max={11} stepFine={0.1} stepCoarse={1} unit="%" decimals={1} />

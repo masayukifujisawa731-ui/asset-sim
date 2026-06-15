@@ -230,6 +230,8 @@ input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color:
 }
 /* 防衛ライン割れの色以外の手がかり */
 .warn-mark { color: var(--red); font-size: 9px; margin-right: 3px; }
+/* MC再計算中の控えめなインジケータ */
+.calc-pending { color: var(--accent); font-weight: 400; text-transform: none; letter-spacing: 0; }
 
 /* タブAと共有する前提の確認ストリップ（MCタブ） */
 .shared-strip {
