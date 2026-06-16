@@ -82,7 +82,7 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        labels: { color: '#7f8599', font: { size: 11 }, usePointStyle: true },
+        labels: { color: '#8d94a8', font: { size: 11 }, usePointStyle: true },
       },
       tooltip: {
         callbacks: {
@@ -96,12 +96,12 @@ export function ProjectionChart({ rows, idecoEnabled = false }: Props) {
     },
     scales: {
       x: {
-        ticks: { color: '#7f8599', font: { size: 10 } },
+        ticks: { color: '#8d94a8', font: { size: 10 } },
         grid: { color: 'rgba(255,255,255,0.05)' },
       },
       y: {
         ticks: {
-          color: '#7f8599',
+          color: '#8d94a8',
           font: { size: 10 },
           callback: (v: number | string) => {
             const n = Number(v);
