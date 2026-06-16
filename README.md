@@ -31,7 +31,8 @@ npm run lint     # ESLint
 ## 開発者向け
 
 - 品質レビューの観点・チェック・対策集（AIに読ませてQAを高速化できる）：
-  [docs/QA_PLAYBOOK.md](./docs/QA_PLAYBOOK.md)
+  [docs/QA_PLAYBOOK.md](./docs/QA_PLAYBOOK.md)（トピック別）／
+  [docs/REVIEW_PERSONAS.md](./docs/REVIEW_PERSONAS.md)（立場別レビュー）
 
 ## ライセンス
 
