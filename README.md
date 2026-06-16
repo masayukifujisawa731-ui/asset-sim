@@ -28,6 +28,11 @@ npm run lint     # ESLint
 
 試算ロジックの詳細は [METHODOLOGY.md](./METHODOLOGY.md) を参照してください。
 
+## 開発者向け
+
+- 品質レビューの観点・チェック・対策集（AIに読ませてQAを高速化できる）：
+  [docs/QA_PLAYBOOK.md](./docs/QA_PLAYBOOK.md)
+
 ## ライセンス
 
 [MIT](./LICENSE)
