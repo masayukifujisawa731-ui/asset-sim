@@ -35,6 +35,11 @@ const cspPlugin: Plugin = {
 export default defineConfig({
   plugins: [react(), cspPlugin],
   test: {
+    // 既定は高速な node。UIテストは各ファイル冒頭の
+    // `// @vitest-environment jsdom` で個別に jsdom へ切り替える。
     environment: 'node',
+    setupFiles: ['./tests/setup.ts'],
+    // globals を有効化すると @testing-library/react の afterEach 自動クリーンアップが効く
+    globals: true,
   },
 })
